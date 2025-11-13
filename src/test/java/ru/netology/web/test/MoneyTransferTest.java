@@ -46,6 +46,7 @@ class MoneyTransferTest {
             Assertions.assertEquals(expectedSecondCardBalance, secondCardStartBalance);
         } catch (AssertionError e) {
             failTestClean = true;
+            throw e;
         } finally {
             if (failTestClean) {
                 dashboardPage.cardTransfer(DataHelper.getSecondCardInfo());
@@ -79,6 +80,7 @@ class MoneyTransferTest {
             Assertions.assertEquals(expectedSecondCardBalance, secondCardStartBalance);
         } catch (AssertionError e) {
             failTestClean = true;
+            throw e;
         } finally {
             if (failTestClean) {
                 dashboardPage.cardTransfer(DataHelper.getSecondCardInfo());
@@ -138,16 +140,16 @@ class MoneyTransferTest {
         verificationPage.errorVerificationMessage("Неверно указан код! Попробуйте ещё раз.");
     }
 
-//    @Test
-//    @DisplayName("should Update Page")
-//    void shouldUpdatePage() {
-//        var loginPage = new LoginPage();
-//        var validAuthInfo = DataHelper.getAuthInfo();
-//        loginPage.validLogin(validAuthInfo);
-//        Selenide.refresh();
-//        new VerificationPage();
-//
-//    }
+    @Test
+    @DisplayName("should Update Page")
+    void shouldUpdatePage() {
+        var loginPage = new LoginPage();
+        var validAuthInfo = DataHelper.getAuthInfo();
+        loginPage.validLogin(validAuthInfo);
+        Selenide.refresh();
+        new VerificationPage();
+
+    }
 
 
 }

@@ -76,8 +76,8 @@ class MoneyTransferTest {
         var actualFirstCardBalance = dashboardPage.getCardBalance(DataHelper.getFirstCardInfo());
         var actualSecondCardBalance = dashboardPage.getCardBalance(DataHelper.getSecondCardInfo());
         try {
-            Assertions.assertEquals(actualFirstCardBalance, firstCardStartBalance);
-            Assertions.assertEquals(actualSecondCardBalance, secondCardStartBalance);
+            Assertions.assertEquals(firstCardStartBalance, actualFirstCardBalance);
+            Assertions.assertEquals(secondCardStartBalance ,actualSecondCardBalance);
         } catch (AssertionError e) {
             failTestClean = true;
             throw e;

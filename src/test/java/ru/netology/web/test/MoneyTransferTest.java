@@ -89,7 +89,39 @@ class MoneyTransferTest {
         }
 
     }
+    @Test
+    @DisplayName("should Transfer Money Between Own Cards")
+    void shouldTransferHugeAmountBetweenOwnCards() {
+        var loginPage = new LoginPage();
+        var authInfo = DataHelper.getAuthInfo();
+        var verificationPage = loginPage.validLogin(authInfo);
+        var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
+        var dashboardPage = verificationPage.validVerify(verificationCode);
 
+        var firstCardStartBalance = dashboardPage.getCardBalance(DataHelper.getFirstCardInfo());
+        var secondCardStartBalance = dashboardPage.getCardBalance(DataHelper.getSecondCardInfo());
+        var transferPage = dashboardPage.cardTransfer(DataHelper.getFirstCardInfo());
+        var amount = new Random().nextInt(9_000_000)+1_000_000;
+        transferPage.transferFromCard(DataHelper.getSecondCardInfo(), amount);
+        var expectedFirstCardBalance = dashboardPage.getCardBalance(DataHelper.getFirstCardInfo()) - amount;
+        var expectedSecondCardBalance = dashboardPage.getCardBalance(DataHelper.getSecondCardInfo()) + amount;
+        try {
+            Assertions.assertEquals(expectedFirstCardBalance, firstCardStartBalance);
+            Assertions.assertEquals(expectedSecondCardBalance, secondCardStartBalance);
+        } catch (AssertionError e) {
+            failTestClean = true;
+            throw e;
+        } finally {
+            if (failTestClean) {
+                dashboardPage.cardTransfer(DataHelper.getSecondCardInfo());
+                transferPage.transferFromCard(DataHelper.getFirstCardInfo(), amount);
+            }
+        }
+        dashboardPage.cardTransfer(DataHelper.getSecondCardInfo());
+        transferPage.transferFromCard(DataHelper.getFirstCardInfo(), amount);
+
+
+    }
     @Test
     @DisplayName("should Chancel Transfer")
     void shouldChancelTransfer() {

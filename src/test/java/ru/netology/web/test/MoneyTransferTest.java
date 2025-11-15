@@ -60,7 +60,7 @@ class MoneyTransferTest {
     }
 
     @Test
-    @DisplayName("should Transfer Money Between Own Cards")
+    @DisplayName("should Not Transfer Money Between Own Cards")
     void shouldNotTransferMoneyBetweenOwnCardsOverLimit() {
         var loginPage = new LoginPage();
         var authInfo = DataHelper.getAuthInfo();
@@ -73,11 +73,11 @@ class MoneyTransferTest {
         var transferPage = dashboardPage.cardTransfer(DataHelper.getFirstCardInfo());
         var amount = new Random().nextInt(100_000)+100_000;
         dashboardPage = transferPage.transferFromCard(DataHelper.getSecondCardInfo(), amount);
-        var expectedFirstCardBalance = dashboardPage.getCardBalance(DataHelper.getFirstCardInfo());
-        var expectedSecondCardBalance = dashboardPage.getCardBalance(DataHelper.getSecondCardInfo());
+        var actualFirstCardBalance = dashboardPage.getCardBalance(DataHelper.getFirstCardInfo());
+        var actualSecondCardBalance = dashboardPage.getCardBalance(DataHelper.getSecondCardInfo());
         try {
-            Assertions.assertEquals(expectedFirstCardBalance, firstCardStartBalance);
-            Assertions.assertEquals(expectedSecondCardBalance, secondCardStartBalance);
+            Assertions.assertEquals(actualFirstCardBalance, firstCardStartBalance);
+            Assertions.assertEquals(actualSecondCardBalance, secondCardStartBalance);
         } catch (AssertionError e) {
             failTestClean = true;
             throw e;

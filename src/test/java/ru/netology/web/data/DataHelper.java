@@ -1,5 +1,6 @@
 package ru.netology.web.data;
 
+import com.github.javafaker.Faker;
 import lombok.Value;
 
 import java.text.MessageFormat;
@@ -37,10 +38,18 @@ public class DataHelper {
         return cutCardNum;
     }
 
-    @Value
-    public static class VerificationCode {
-        private String code;
+    public static int validAmountGenerator() {
+        return new Faker().number().numberBetween(0, 10_000);
     }
+
+    public static int hugeAmountGenerator() {
+        return new Faker().number().numberBetween(1_000_000, Integer.MAX_VALUE);
+    }
+
+    public static int invalidAmountGenerator() {
+        return new Faker().number().numberBetween(10_000, 999_999);
+    }
+
 
     public static VerificationCode getVerificationCodeFor(AuthInfo authInfo) {
         return new VerificationCode("12345");
@@ -60,5 +69,10 @@ public class DataHelper {
     public static class AuthInfo {
         private String login;
         private String password;
+    }
+
+    @Value
+    public static class VerificationCode {
+        private String code;
     }
 }

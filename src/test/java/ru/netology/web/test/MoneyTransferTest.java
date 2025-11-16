@@ -6,8 +6,6 @@ import ru.netology.web.data.DataHelper;
 import ru.netology.web.page.LoginPage;
 import ru.netology.web.page.VerificationPage;
 
-import java.util.Random;
-
 import static com.codeborne.selenide.Selenide.open;
 
 class MoneyTransferTest {
@@ -18,12 +16,6 @@ class MoneyTransferTest {
         open("http://localhost:9999");
         failTestClean = false;
     }
-
-    @AfterEach
-    public void cleanIfFail() {
-
-    }
-
 
     @Test
     @DisplayName("should Transfer Money Between Own Cards")
@@ -37,13 +29,15 @@ class MoneyTransferTest {
         var firstCardStartBalance = dashboardPage.getCardBalance(DataHelper.getFirstCardInfo());
         var secondCardStartBalance = dashboardPage.getCardBalance(DataHelper.getSecondCardInfo());
         var transferPage = dashboardPage.cardTransfer(DataHelper.getFirstCardInfo());
-        var amount = new Random().nextInt(9000);
+        var amount = DataHelper.validAmountGenerator();
         transferPage.transferFromCard(DataHelper.getSecondCardInfo(), amount);
         var expectedFirstCardBalance = dashboardPage.getCardBalance(DataHelper.getFirstCardInfo()) - amount;
         var expectedSecondCardBalance = dashboardPage.getCardBalance(DataHelper.getSecondCardInfo()) + amount;
         try {
-            Assertions.assertEquals(expectedFirstCardBalance, firstCardStartBalance);
-            Assertions.assertEquals(expectedSecondCardBalance, secondCardStartBalance);
+            Assertions.assertAll(
+                    () -> Assertions.assertEquals(expectedFirstCardBalance, firstCardStartBalance),
+                    () -> Assertions.assertEquals(expectedSecondCardBalance, secondCardStartBalance)
+            );
         } catch (AssertionError e) {
             failTestClean = true;
             throw e;
@@ -55,8 +49,6 @@ class MoneyTransferTest {
         }
         dashboardPage.cardTransfer(DataHelper.getSecondCardInfo());
         transferPage.transferFromCard(DataHelper.getFirstCardInfo(), amount);
-
-
     }
 
     @Test
@@ -67,17 +59,18 @@ class MoneyTransferTest {
         var verificationPage = loginPage.validLogin(authInfo);
         var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
         var dashboardPage = verificationPage.validVerify(verificationCode);
-
         var firstCardStartBalance = dashboardPage.getCardBalance(DataHelper.getFirstCardInfo());
         var secondCardStartBalance = dashboardPage.getCardBalance(DataHelper.getSecondCardInfo());
         var transferPage = dashboardPage.cardTransfer(DataHelper.getFirstCardInfo());
-        var amount = new Random().nextInt(100_000)+100_000;
+        var amount = DataHelper.invalidAmountGenerator();
         dashboardPage = transferPage.transferFromCard(DataHelper.getSecondCardInfo(), amount);
         var actualFirstCardBalance = dashboardPage.getCardBalance(DataHelper.getFirstCardInfo());
         var actualSecondCardBalance = dashboardPage.getCardBalance(DataHelper.getSecondCardInfo());
         try {
-            Assertions.assertEquals(firstCardStartBalance, actualFirstCardBalance);
-            Assertions.assertEquals(secondCardStartBalance ,actualSecondCardBalance);
+            Assertions.assertAll(
+                    () -> Assertions.assertEquals(firstCardStartBalance, actualFirstCardBalance),
+                    () -> Assertions.assertEquals(secondCardStartBalance, actualSecondCardBalance)
+            );
         } catch (AssertionError e) {
             failTestClean = true;
             throw e;
@@ -87,10 +80,10 @@ class MoneyTransferTest {
                 transferPage.transferFromCard(DataHelper.getFirstCardInfo(), amount);
             }
         }
-
     }
+
     @Test
-    @DisplayName("should Transfer Money Between Own Cards")
+    @DisplayName("should Transfer Huge Amount Between Own Cards")
     void shouldTransferHugeAmountBetweenOwnCards() {
         var loginPage = new LoginPage();
         var authInfo = DataHelper.getAuthInfo();
@@ -101,13 +94,15 @@ class MoneyTransferTest {
         var firstCardStartBalance = dashboardPage.getCardBalance(DataHelper.getFirstCardInfo());
         var secondCardStartBalance = dashboardPage.getCardBalance(DataHelper.getSecondCardInfo());
         var transferPage = dashboardPage.cardTransfer(DataHelper.getFirstCardInfo());
-        var amount = new Random().nextInt(9_000_000)+1_000_000;
+        var amount = DataHelper.hugeAmountGenerator();
         transferPage.transferFromCard(DataHelper.getSecondCardInfo(), amount);
         var expectedFirstCardBalance = dashboardPage.getCardBalance(DataHelper.getFirstCardInfo()) - amount;
         var expectedSecondCardBalance = dashboardPage.getCardBalance(DataHelper.getSecondCardInfo()) + amount;
         try {
-            Assertions.assertEquals(expectedFirstCardBalance, firstCardStartBalance);
-            Assertions.assertEquals(expectedSecondCardBalance, secondCardStartBalance);
+            Assertions.assertAll(
+                    () -> Assertions.assertEquals(expectedFirstCardBalance, firstCardStartBalance),
+                    () -> Assertions.assertEquals(expectedSecondCardBalance, secondCardStartBalance)
+            );
         } catch (AssertionError e) {
             failTestClean = true;
             throw e;
@@ -119,9 +114,8 @@ class MoneyTransferTest {
         }
         dashboardPage.cardTransfer(DataHelper.getSecondCardInfo());
         transferPage.transferFromCard(DataHelper.getFirstCardInfo(), amount);
-
-
     }
+
     @Test
     @DisplayName("should Chancel Transfer")
     void shouldChancelTransfer() {
@@ -132,16 +126,6 @@ class MoneyTransferTest {
         var dashboardPage = verificationPage.validVerify(verificationCode);
         var transferPage = dashboardPage.cardTransfer(DataHelper.getFirstCardInfo());
         transferPage.chancelTransfer();
-    }
-
-    @Test
-    @DisplayName("should Login")
-    void shouldLogin() {
-        var loginPage = new LoginPage();
-        var authInfo = DataHelper.getAuthInfo();
-        var verificationPage = loginPage.validLogin(authInfo);
-        var verificationCode = DataHelper.getVerificationCodeFor(authInfo);
-        verificationPage.validVerify(verificationCode);
     }
 
     @Test
